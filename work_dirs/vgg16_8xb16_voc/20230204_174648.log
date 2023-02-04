@@ -1,0 +1,363 @@
+2023-02-04 17:46:48,691 - mmcls - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.16 (default, Jan 17 2023, 23:13:24) [GCC 11.2.0]
+CUDA available: True
+GPU 0: NVIDIA GeForce RTX 2080 Ti
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 11.3, V11.3.109
+GCC: gcc (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0
+PyTorch: 1.10.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) oneAPI Math Kernel Library Version 2021.4-Product Build 20210904 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.2.3 (Git Hash 7336ca9f055cf1bfa13efb658fe15dc9b41f0740)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX512
+  - CUDA Runtime 11.3
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_61,code=sm_61;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86;-gencode;arch=compute_37,code=compute_37
+  - CuDNN 8.2
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.3, CUDNN_VERSION=8.2.0, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.10.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, 
+
+TorchVision: 0.11.0
+OpenCV: 4.6.0
+MMCV: 1.7.1
+MMCV Compiler: GCC 9.3
+MMCV CUDA Compiler: 11.3
+MMClassification: 0.25.0+3d4f80d
+------------------------------------------------------------
+
+2023-02-04 17:46:48,692 - mmcls - INFO - Distributed training: False
+2023-02-04 17:46:48,833 - mmcls - INFO - Config:
+dataset_type = 'VOC'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='RandomResizedCrop', size=224),
+    dict(type='RandomFlip', flip_prob=0.5, direction='horizontal'),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(type='ToTensor', keys=['gt_label']),
+    dict(type='Collect', keys=['img', 'gt_label'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='Resize', size=(256, -1)),
+    dict(type='CenterCrop', crop_size=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(type='Collect', keys=['img'])
+]
+data = dict(
+    samples_per_gpu=16,
+    workers_per_gpu=2,
+    train=dict(
+        type='VOC',
+        data_prefix='data/VOCdevkit/VOC2007/',
+        ann_file='data/VOCdevkit/VOC2007/ImageSets/Main/trainval.txt',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='RandomResizedCrop', size=224),
+            dict(type='RandomFlip', flip_prob=0.5, direction='horizontal'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='ToTensor', keys=['gt_label']),
+            dict(type='Collect', keys=['img', 'gt_label'])
+        ]),
+    val=dict(
+        type='VOC',
+        data_prefix='data/VOCdevkit/VOC2007/',
+        ann_file='data/VOCdevkit/VOC2007/ImageSets/Main/test.txt',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Resize', size=(256, -1)),
+            dict(type='CenterCrop', crop_size=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ]),
+    test=dict(
+        type='VOC',
+        data_prefix='data/VOCdevkit/VOC2007/',
+        ann_file='data/VOCdevkit/VOC2007/ImageSets/Main/test.txt',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Resize', size=(256, -1)),
+            dict(type='CenterCrop', crop_size=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ]))
+evaluation = dict(
+    interval=1, metric=['mAP', 'CP', 'OP', 'CR', 'OR', 'CF1', 'OF1'])
+checkpoint_config = dict(interval=10)
+log_config = dict(interval=100, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = 'https://download.openmmlab.com/mmclassification/v0/vgg/vgg16_batch256_imagenet_20210208-db26f1a5.pth'
+resume_from = None
+workflow = [('train', 1)]
+model = dict(
+    type='ImageClassifier',
+    backbone=dict(type='VGG', depth=16, num_classes=20),
+    neck=None,
+    head=dict(
+        type='MultiLabelClsHead',
+        loss=dict(type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0)))
+optimizer = dict(
+    type='SGD',
+    lr=0.001,
+    momentum=0.9,
+    weight_decay=0,
+    paramwise_cfg=dict(
+        custom_keys=dict({'.backbone.classifier': dict(lr_mult=10)})))
+optimizer_config = dict(grad_clip=None)
+lr_config = dict(policy='step', step=20, gamma=0.1)
+runner = dict(type='EpochBasedRunner', max_epochs=40)
+work_dir = './work_dirs/vgg16_8xb16_voc'
+gpu_ids = [0]
+
+2023-02-04 17:46:48,833 - mmcls - INFO - Set random seed to 1794042110, deterministic: False
+2023-02-04 17:46:55,160 - mmcls - INFO - load checkpoint from http path: https://download.openmmlab.com/mmclassification/v0/vgg/vgg16_batch256_imagenet_20210208-db26f1a5.pth
+2023-02-04 17:46:55,698 - mmcls - WARNING - The model and loaded state dict do not match exactly
+
+size mismatch for backbone.classifier.6.weight: copying a param with shape torch.Size([1000, 4096]) from checkpoint, the shape in current model is torch.Size([20, 4096]).
+size mismatch for backbone.classifier.6.bias: copying a param with shape torch.Size([1000]) from checkpoint, the shape in current model is torch.Size([20]).
+2023-02-04 17:46:55,732 - mmcls - INFO - Start running, host: root@autodl-container-684f11b452-ed2e12df, work_dir: /root/autodl-tmp/mmclassification/work_dirs/vgg16_8xb16_voc
+2023-02-04 17:46:55,732 - mmcls - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) CheckpointHook                     
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalHook                           
+ -------------------- 
+after_train_iter:
+(ABOVE_NORMAL) OptimizerHook                      
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2023-02-04 17:46:55,733 - mmcls - INFO - workflow: [('train', 1)], max: 40 epochs
+2023-02-04 17:46:55,733 - mmcls - INFO - Checkpoints will be saved to /root/autodl-tmp/mmclassification/work_dirs/vgg16_8xb16_voc by HardDiskBackend.
+2023-02-04 17:47:09,437 - mmcls - INFO - Epoch [1][100/314]	lr: 1.000e-03, eta: 0:28:18, time: 0.136, data_time: 0.025, memory: 3053, loss: 3.7438
+2023-02-04 17:47:19,941 - mmcls - INFO - Epoch [1][200/314]	lr: 1.000e-03, eta: 0:24:51, time: 0.105, data_time: 0.001, memory: 3053, loss: 2.4840
+2023-02-04 17:47:30,463 - mmcls - INFO - Epoch [1][300/314]	lr: 1.000e-03, eta: 0:23:36, time: 0.105, data_time: 0.001, memory: 3053, loss: 2.3652
+2023-02-04 17:47:42,609 - mmcls - INFO - Epoch(val) [1][310]	mAP: 81.4704, CP: 81.7049, CR: 66.2951, CF1: 73.1978, OP: 86.5845, OR: 68.1021, OF1: 76.2391
+2023-02-04 17:47:55,272 - mmcls - INFO - Epoch [2][100/314]	lr: 1.000e-03, eta: 0:23:06, time: 0.126, data_time: 0.021, memory: 3053, loss: 2.1616
+2023-02-04 17:48:05,829 - mmcls - INFO - Epoch [2][200/314]	lr: 1.000e-03, eta: 0:22:34, time: 0.106, data_time: 0.001, memory: 3053, loss: 2.2071
+2023-02-04 17:48:16,392 - mmcls - INFO - Epoch [2][300/314]	lr: 1.000e-03, eta: 0:22:10, time: 0.106, data_time: 0.001, memory: 3053, loss: 2.1845
+2023-02-04 17:48:28,303 - mmcls - INFO - Epoch(val) [2][310]	mAP: 84.3747, CP: 83.6186, CR: 71.5268, CF1: 77.1015, OP: 82.6871, OR: 77.8412, OF1: 80.1910
+2023-02-04 17:48:40,964 - mmcls - INFO - Epoch [3][100/314]	lr: 1.000e-03, eta: 0:21:55, time: 0.126, data_time: 0.021, memory: 3053, loss: 1.9212
+2023-02-04 17:48:51,531 - mmcls - INFO - Epoch [3][200/314]	lr: 1.000e-03, eta: 0:21:36, time: 0.106, data_time: 0.001, memory: 3053, loss: 2.0821
+2023-02-04 17:49:02,115 - mmcls - INFO - Epoch [3][300/314]	lr: 1.000e-03, eta: 0:21:19, time: 0.106, data_time: 0.001, memory: 3053, loss: 2.1205
+2023-02-04 17:49:13,964 - mmcls - INFO - Epoch(val) [3][310]	mAP: 84.9787, CP: 81.9125, CR: 73.3264, CF1: 77.3820, OP: 82.3538, OR: 77.3278, OF1: 79.7617
+2023-02-04 17:49:26,652 - mmcls - INFO - Epoch [4][100/314]	lr: 1.000e-03, eta: 0:21:08, time: 0.126, data_time: 0.021, memory: 3053, loss: 1.9212
+2023-02-04 17:49:37,246 - mmcls - INFO - Epoch [4][200/314]	lr: 1.000e-03, eta: 0:20:52, time: 0.106, data_time: 0.001, memory: 3053, loss: 1.9644
+2023-02-04 17:49:47,836 - mmcls - INFO - Epoch [4][300/314]	lr: 1.000e-03, eta: 0:20:38, time: 0.106, data_time: 0.001, memory: 3053, loss: 1.8910
+2023-02-04 17:49:59,711 - mmcls - INFO - Epoch(val) [4][310]	mAP: 84.9325, CP: 81.0544, CR: 72.8132, CF1: 76.7131, OP: 82.8137, OR: 77.6415, OF1: 80.1442
+2023-02-04 17:50:12,403 - mmcls - INFO - Epoch [5][100/314]	lr: 1.000e-03, eta: 0:20:27, time: 0.126, data_time: 0.021, memory: 3053, loss: 1.8906
+2023-02-04 17:50:23,000 - mmcls - INFO - Epoch [5][200/314]	lr: 1.000e-03, eta: 0:20:13, time: 0.106, data_time: 0.001, memory: 3053, loss: 1.8635
+2023-02-04 17:50:33,609 - mmcls - INFO - Epoch [5][300/314]	lr: 1.000e-03, eta: 0:20:00, time: 0.106, data_time: 0.001, memory: 3053, loss: 1.8927
+2023-02-04 17:50:45,408 - mmcls - INFO - Epoch(val) [5][310]	mAP: 85.6979, CP: 80.6800, CR: 74.5505, CF1: 77.4942, OP: 80.0087, OR: 78.5256, OF1: 79.2602
+2023-02-04 17:50:58,117 - mmcls - INFO - Epoch [6][100/314]	lr: 1.000e-03, eta: 0:19:49, time: 0.126, data_time: 0.021, memory: 3053, loss: 1.7458
+2023-02-04 17:51:08,727 - mmcls - INFO - Epoch [6][200/314]	lr: 1.000e-03, eta: 0:19:36, time: 0.106, data_time: 0.001, memory: 3053, loss: 1.8488
+2023-02-04 17:51:19,337 - mmcls - INFO - Epoch [6][300/314]	lr: 1.000e-03, eta: 0:19:23, time: 0.106, data_time: 0.001, memory: 3053, loss: 1.8163
+2023-02-04 17:51:31,196 - mmcls - INFO - Epoch(val) [6][310]	mAP: 85.8893, CP: 80.0228, CR: 77.1991, CF1: 78.5856, OP: 81.8539, OR: 80.2082, OF1: 81.0227
+2023-02-04 17:51:43,894 - mmcls - INFO - Epoch [7][100/314]	lr: 1.000e-03, eta: 0:19:12, time: 0.126, data_time: 0.021, memory: 3053, loss: 1.7158
+2023-02-04 17:51:54,505 - mmcls - INFO - Epoch [7][200/314]	lr: 1.000e-03, eta: 0:19:00, time: 0.106, data_time: 0.001, memory: 3053, loss: 1.7782
+2023-02-04 17:52:05,148 - mmcls - INFO - Epoch [7][300/314]	lr: 1.000e-03, eta: 0:18:48, time: 0.106, data_time: 0.001, memory: 3053, loss: 1.7125
+2023-02-04 17:52:16,980 - mmcls - INFO - Epoch(val) [7][310]	mAP: 86.8302, CP: 79.7295, CR: 79.3326, CF1: 79.5306, OP: 80.1285, OR: 81.8195, OF1: 80.9651
+2023-02-04 17:52:29,715 - mmcls - INFO - Epoch [8][100/314]	lr: 1.000e-03, eta: 0:18:36, time: 0.127, data_time: 0.021, memory: 3053, loss: 1.7191
+2023-02-04 17:52:40,366 - mmcls - INFO - Epoch [8][200/314]	lr: 1.000e-03, eta: 0:18:25, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.6029
+2023-02-04 17:52:51,030 - mmcls - INFO - Epoch [8][300/314]	lr: 1.000e-03, eta: 0:18:13, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.7268
+2023-02-04 17:53:02,813 - mmcls - INFO - Epoch(val) [8][310]	mAP: 86.1428, CP: 81.5088, CR: 76.1985, CF1: 78.7643, OP: 82.6753, OR: 80.0228, OF1: 81.3274
+2023-02-04 17:53:15,567 - mmcls - INFO - Epoch [9][100/314]	lr: 1.000e-03, eta: 0:18:02, time: 0.127, data_time: 0.021, memory: 3053, loss: 1.6193
+2023-02-04 17:53:26,218 - mmcls - INFO - Epoch [9][200/314]	lr: 1.000e-03, eta: 0:17:50, time: 0.106, data_time: 0.001, memory: 3053, loss: 1.6687
+2023-02-04 17:53:36,877 - mmcls - INFO - Epoch [9][300/314]	lr: 1.000e-03, eta: 0:17:38, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.5738
+2023-02-04 17:53:48,683 - mmcls - INFO - Epoch(val) [9][310]	mAP: 87.0149, CP: 79.5277, CR: 79.0834, CF1: 79.3049, OP: 82.4219, OR: 81.2348, OF1: 81.8241
+2023-02-04 17:54:01,468 - mmcls - INFO - Epoch [10][100/314]	lr: 1.000e-03, eta: 0:17:27, time: 0.127, data_time: 0.021, memory: 3053, loss: 1.5362
+2023-02-04 17:54:12,128 - mmcls - INFO - Epoch [10][200/314]	lr: 1.000e-03, eta: 0:17:15, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.6164
+2023-02-04 17:54:22,792 - mmcls - INFO - Epoch [10][300/314]	lr: 1.000e-03, eta: 0:17:04, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.5298
+2023-02-04 17:54:24,194 - mmcls - INFO - Saving checkpoint at 10 epochs
+2023-02-04 17:54:37,833 - mmcls - INFO - Epoch(val) [10][310]	mAP: 86.7319, CP: 79.3081, CR: 79.2444, CF1: 79.2762, OP: 80.1950, OR: 82.1047, OF1: 81.1386
+2023-02-04 17:54:50,581 - mmcls - INFO - Epoch [11][100/314]	lr: 1.000e-03, eta: 0:16:52, time: 0.127, data_time: 0.021, memory: 3053, loss: 1.4593
+2023-02-04 17:55:01,241 - mmcls - INFO - Epoch [11][200/314]	lr: 1.000e-03, eta: 0:16:41, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.6111
+2023-02-04 17:55:11,922 - mmcls - INFO - Epoch [11][300/314]	lr: 1.000e-03, eta: 0:16:30, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.5030
+2023-02-04 17:55:23,815 - mmcls - INFO - Epoch(val) [11][310]	mAP: 86.4422, CP: 80.4360, CR: 77.3747, CF1: 78.8757, OP: 81.8182, OR: 80.5932, OF1: 81.2011
+2023-02-04 17:55:36,596 - mmcls - INFO - Epoch [12][100/314]	lr: 1.000e-03, eta: 0:16:18, time: 0.127, data_time: 0.021, memory: 3053, loss: 1.5221
+2023-02-04 17:55:47,279 - mmcls - INFO - Epoch [12][200/314]	lr: 1.000e-03, eta: 0:16:07, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.4731
+2023-02-04 17:55:57,968 - mmcls - INFO - Epoch [12][300/314]	lr: 1.000e-03, eta: 0:15:56, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.4413
+2023-02-04 17:56:09,844 - mmcls - INFO - Epoch(val) [12][310]	mAP: 86.6805, CP: 79.8119, CR: 78.2982, CF1: 79.0478, OP: 80.7383, OR: 81.7054, OF1: 81.2190
+2023-02-04 17:56:22,626 - mmcls - INFO - Epoch [13][100/314]	lr: 1.000e-03, eta: 0:15:44, time: 0.127, data_time: 0.021, memory: 3053, loss: 1.4224
+2023-02-04 17:56:33,315 - mmcls - INFO - Epoch [13][200/314]	lr: 1.000e-03, eta: 0:15:33, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.3900
+2023-02-04 17:56:44,008 - mmcls - INFO - Epoch [13][300/314]	lr: 1.000e-03, eta: 0:15:21, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.4648
+2023-02-04 17:56:55,851 - mmcls - INFO - Epoch(val) [13][310]	mAP: 86.5257, CP: 80.5469, CR: 77.4135, CF1: 78.9491, OP: 82.3081, OR: 80.1369, OF1: 81.2080
+2023-02-04 17:57:08,623 - mmcls - INFO - Epoch [14][100/314]	lr: 1.000e-03, eta: 0:15:10, time: 0.127, data_time: 0.021, memory: 3053, loss: 1.4409
+2023-02-04 17:57:19,314 - mmcls - INFO - Epoch [14][200/314]	lr: 1.000e-03, eta: 0:14:59, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.4875
+2023-02-04 17:57:30,006 - mmcls - INFO - Epoch [14][300/314]	lr: 1.000e-03, eta: 0:14:47, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.4425
+2023-02-04 17:57:41,854 - mmcls - INFO - Epoch(val) [14][310]	mAP: 86.6929, CP: 80.8016, CR: 78.4189, CF1: 79.5924, OP: 81.9873, OR: 81.0637, OF1: 81.5229
+2023-02-04 17:57:54,632 - mmcls - INFO - Epoch [15][100/314]	lr: 1.000e-03, eta: 0:14:36, time: 0.127, data_time: 0.021, memory: 3053, loss: 1.3450
+2023-02-04 17:58:05,321 - mmcls - INFO - Epoch [15][200/314]	lr: 1.000e-03, eta: 0:14:24, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.3449
+2023-02-04 17:58:16,019 - mmcls - INFO - Epoch [15][300/314]	lr: 1.000e-03, eta: 0:14:13, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.3362
+2023-02-04 17:58:28,078 - mmcls - INFO - Epoch(val) [15][310]	mAP: 86.7412, CP: 79.9394, CR: 79.8542, CF1: 79.8968, OP: 80.7546, OR: 81.7910, OF1: 81.2695
+2023-02-04 17:58:40,896 - mmcls - INFO - Epoch [16][100/314]	lr: 1.000e-03, eta: 0:14:01, time: 0.127, data_time: 0.021, memory: 3053, loss: 1.2856
+2023-02-04 17:58:51,585 - mmcls - INFO - Epoch [16][200/314]	lr: 1.000e-03, eta: 0:13:50, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.3817
+2023-02-04 17:59:02,282 - mmcls - INFO - Epoch [16][300/314]	lr: 1.000e-03, eta: 0:13:39, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.3983
+2023-02-04 17:59:14,375 - mmcls - INFO - Epoch(val) [16][310]	mAP: 87.2464, CP: 79.9248, CR: 79.8386, CF1: 79.8817, OP: 79.6969, OR: 83.2311, OF1: 81.4257
+2023-02-04 17:59:27,135 - mmcls - INFO - Epoch [17][100/314]	lr: 1.000e-03, eta: 0:13:27, time: 0.127, data_time: 0.021, memory: 3053, loss: 1.3242
+2023-02-04 17:59:37,812 - mmcls - INFO - Epoch [17][200/314]	lr: 1.000e-03, eta: 0:13:16, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.3140
+2023-02-04 17:59:48,497 - mmcls - INFO - Epoch [17][300/314]	lr: 1.000e-03, eta: 0:13:05, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.3473
+2023-02-04 18:00:00,606 - mmcls - INFO - Epoch(val) [17][310]	mAP: 86.3262, CP: 78.9615, CR: 78.1400, CF1: 78.5486, OP: 81.1001, OR: 79.0532, OF1: 80.0635
+2023-02-04 18:00:13,366 - mmcls - INFO - Epoch [18][100/314]	lr: 1.000e-03, eta: 0:12:53, time: 0.127, data_time: 0.021, memory: 3053, loss: 1.2522
+2023-02-04 18:00:24,034 - mmcls - INFO - Epoch [18][200/314]	lr: 1.000e-03, eta: 0:12:42, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.2550
+2023-02-04 18:00:34,709 - mmcls - INFO - Epoch [18][300/314]	lr: 1.000e-03, eta: 0:12:31, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.3302
+2023-02-04 18:00:46,804 - mmcls - INFO - Epoch(val) [18][310]	mAP: 86.4981, CP: 79.4476, CR: 78.6512, CF1: 79.0474, OP: 81.2154, OR: 81.5628, OF1: 81.3887
+2023-02-04 18:00:59,551 - mmcls - INFO - Epoch [19][100/314]	lr: 1.000e-03, eta: 0:12:19, time: 0.127, data_time: 0.021, memory: 3053, loss: 1.2770
+2023-02-04 18:01:10,210 - mmcls - INFO - Epoch [19][200/314]	lr: 1.000e-03, eta: 0:12:08, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.2451
+2023-02-04 18:01:20,876 - mmcls - INFO - Epoch [19][300/314]	lr: 1.000e-03, eta: 0:11:57, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.3413
+2023-02-04 18:01:33,019 - mmcls - INFO - Epoch(val) [19][310]	mAP: 86.8678, CP: 80.6741, CR: 78.1028, CF1: 79.3676, OP: 82.0201, OR: 81.6341, OF1: 81.8266
+2023-02-04 18:01:45,797 - mmcls - INFO - Epoch [20][100/314]	lr: 1.000e-03, eta: 0:11:45, time: 0.127, data_time: 0.021, memory: 3053, loss: 1.1878
+2023-02-04 18:01:56,464 - mmcls - INFO - Epoch [20][200/314]	lr: 1.000e-03, eta: 0:11:34, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.1773
+2023-02-04 18:02:07,132 - mmcls - INFO - Epoch [20][300/314]	lr: 1.000e-03, eta: 0:11:23, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.1739
+2023-02-04 18:02:08,534 - mmcls - INFO - Saving checkpoint at 20 epochs
+2023-02-04 18:02:22,558 - mmcls - INFO - Epoch(val) [20][310]	mAP: 85.5333, CP: 77.9128, CR: 77.2731, CF1: 77.5916, OP: 78.4368, OR: 81.2776, OF1: 79.8319
+2023-02-04 18:02:35,305 - mmcls - INFO - Epoch [21][100/314]	lr: 1.000e-04, eta: 0:11:11, time: 0.127, data_time: 0.021, memory: 3053, loss: 1.0808
+2023-02-04 18:02:45,960 - mmcls - INFO - Epoch [21][200/314]	lr: 1.000e-04, eta: 0:10:59, time: 0.107, data_time: 0.001, memory: 3053, loss: 1.0741
+2023-02-04 18:02:56,632 - mmcls - INFO - Epoch [21][300/314]	lr: 1.000e-04, eta: 0:10:48, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.9944
+2023-02-04 18:03:08,809 - mmcls - INFO - Epoch(val) [21][310]	mAP: 87.3936, CP: 79.4160, CR: 81.3137, CF1: 80.3537, OP: 81.4995, OR: 83.5448, OF1: 82.5095
+2023-02-04 18:03:21,570 - mmcls - INFO - Epoch [22][100/314]	lr: 1.000e-04, eta: 0:10:36, time: 0.127, data_time: 0.021, memory: 3053, loss: 1.0308
+2023-02-04 18:03:32,238 - mmcls - INFO - Epoch [22][200/314]	lr: 1.000e-04, eta: 0:10:25, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.9760
+2023-02-04 18:03:42,918 - mmcls - INFO - Epoch [22][300/314]	lr: 1.000e-04, eta: 0:10:14, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.9438
+2023-02-04 18:03:55,122 - mmcls - INFO - Epoch(val) [22][310]	mAP: 87.6105, CP: 79.8108, CR: 81.7648, CF1: 80.7760, OP: 81.5888, OR: 83.9156, OF1: 82.7358
+2023-02-04 18:04:07,875 - mmcls - INFO - Epoch [23][100/314]	lr: 1.000e-04, eta: 0:10:02, time: 0.127, data_time: 0.021, memory: 3053, loss: 0.9505
+2023-02-04 18:04:18,556 - mmcls - INFO - Epoch [23][200/314]	lr: 1.000e-04, eta: 0:09:51, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.8726
+2023-02-04 18:04:29,253 - mmcls - INFO - Epoch [23][300/314]	lr: 1.000e-04, eta: 0:09:40, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.9365
+2023-02-04 18:04:41,513 - mmcls - INFO - Epoch(val) [23][310]	mAP: 87.4999, CP: 78.8500, CR: 82.1250, CF1: 80.4542, OP: 81.7094, OR: 83.7017, OF1: 82.6935
+2023-02-04 18:04:54,301 - mmcls - INFO - Epoch [24][100/314]	lr: 1.000e-04, eta: 0:09:28, time: 0.127, data_time: 0.021, memory: 3053, loss: 0.8824
+2023-02-04 18:05:04,978 - mmcls - INFO - Epoch [24][200/314]	lr: 1.000e-04, eta: 0:09:17, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.8460
+2023-02-04 18:05:15,660 - mmcls - INFO - Epoch [24][300/314]	lr: 1.000e-04, eta: 0:09:06, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.9303
+2023-02-04 18:05:27,900 - mmcls - INFO - Epoch(val) [24][310]	mAP: 87.5937, CP: 78.5052, CR: 82.3148, CF1: 80.3649, OP: 80.8674, OR: 84.0154, OF1: 82.4114
+2023-02-04 18:05:40,663 - mmcls - INFO - Epoch [25][100/314]	lr: 1.000e-04, eta: 0:08:54, time: 0.127, data_time: 0.021, memory: 3053, loss: 0.9090
+2023-02-04 18:05:51,346 - mmcls - INFO - Epoch [25][200/314]	lr: 1.000e-04, eta: 0:08:43, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.8890
+2023-02-04 18:06:02,030 - mmcls - INFO - Epoch [25][300/314]	lr: 1.000e-04, eta: 0:08:32, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.8697
+2023-02-04 18:06:14,411 - mmcls - INFO - Epoch(val) [25][310]	mAP: 87.6827, CP: 79.5965, CR: 81.5735, CF1: 80.5728, OP: 81.8220, OR: 83.7587, OF1: 82.7790
+2023-02-04 18:06:27,192 - mmcls - INFO - Epoch [26][100/314]	lr: 1.000e-04, eta: 0:08:20, time: 0.127, data_time: 0.021, memory: 3053, loss: 0.8888
+2023-02-04 18:06:37,863 - mmcls - INFO - Epoch [26][200/314]	lr: 1.000e-04, eta: 0:08:09, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.9132
+2023-02-04 18:06:48,537 - mmcls - INFO - Epoch [26][300/314]	lr: 1.000e-04, eta: 0:07:58, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.8438
+2023-02-04 18:07:00,886 - mmcls - INFO - Epoch(val) [26][310]	mAP: 87.7836, CP: 79.2689, CR: 82.6638, CF1: 80.9308, OP: 81.7867, OR: 84.0724, OF1: 82.9138
+2023-02-04 18:07:13,631 - mmcls - INFO - Epoch [27][100/314]	lr: 1.000e-04, eta: 0:07:46, time: 0.127, data_time: 0.021, memory: 3053, loss: 0.8528
+2023-02-04 18:07:24,303 - mmcls - INFO - Epoch [27][200/314]	lr: 1.000e-04, eta: 0:07:35, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.8521
+2023-02-04 18:07:34,976 - mmcls - INFO - Epoch [27][300/314]	lr: 1.000e-04, eta: 0:07:24, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.8832
+2023-02-04 18:07:47,195 - mmcls - INFO - Epoch(val) [27][310]	mAP: 87.6900, CP: 79.1887, CR: 81.7152, CF1: 80.4321, OP: 81.3555, OR: 83.8728, OF1: 82.5950
+2023-02-04 18:08:00,000 - mmcls - INFO - Epoch [28][100/314]	lr: 1.000e-04, eta: 0:07:12, time: 0.127, data_time: 0.021, memory: 3053, loss: 0.8249
+2023-02-04 18:08:10,666 - mmcls - INFO - Epoch [28][200/314]	lr: 1.000e-04, eta: 0:07:01, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.8840
+2023-02-04 18:08:21,332 - mmcls - INFO - Epoch [28][300/314]	lr: 1.000e-04, eta: 0:06:50, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.8766
+2023-02-04 18:08:33,603 - mmcls - INFO - Epoch(val) [28][310]	mAP: 87.7851, CP: 78.7613, CR: 82.1482, CF1: 80.4191, OP: 81.5465, OR: 84.0582, OF1: 82.7833
+2023-02-04 18:08:46,367 - mmcls - INFO - Epoch [29][100/314]	lr: 1.000e-04, eta: 0:06:38, time: 0.127, data_time: 0.021, memory: 3053, loss: 0.8767
+2023-02-04 18:08:57,037 - mmcls - INFO - Epoch [29][200/314]	lr: 1.000e-04, eta: 0:06:27, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.8362
+2023-02-04 18:09:07,705 - mmcls - INFO - Epoch [29][300/314]	lr: 1.000e-04, eta: 0:06:16, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.7474
+2023-02-04 18:09:19,944 - mmcls - INFO - Epoch(val) [29][310]	mAP: 87.8696, CP: 78.7103, CR: 82.9913, CF1: 80.7941, OP: 80.8954, OR: 84.7711, OF1: 82.7879
+2023-02-04 18:09:32,680 - mmcls - INFO - Epoch [30][100/314]	lr: 1.000e-04, eta: 0:06:04, time: 0.127, data_time: 0.021, memory: 3053, loss: 0.9108
+2023-02-04 18:09:43,349 - mmcls - INFO - Epoch [30][200/314]	lr: 1.000e-04, eta: 0:05:53, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.8702
+2023-02-04 18:09:54,019 - mmcls - INFO - Epoch [30][300/314]	lr: 1.000e-04, eta: 0:05:42, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.8244
+2023-02-04 18:09:55,423 - mmcls - INFO - Saving checkpoint at 30 epochs
+2023-02-04 18:10:09,614 - mmcls - INFO - Epoch(val) [30][310]	mAP: 87.8029, CP: 79.0022, CR: 82.4169, CF1: 80.6734, OP: 80.8886, OR: 84.3719, OF1: 82.5935
+2023-02-04 18:10:22,350 - mmcls - INFO - Epoch [31][100/314]	lr: 1.000e-04, eta: 0:05:29, time: 0.127, data_time: 0.021, memory: 3053, loss: 0.8622
+2023-02-04 18:10:33,008 - mmcls - INFO - Epoch [31][200/314]	lr: 1.000e-04, eta: 0:05:18, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.8149
+2023-02-04 18:10:43,677 - mmcls - INFO - Epoch [31][300/314]	lr: 1.000e-04, eta: 0:05:08, time: 0.107, data_time: 0.001, memory: 3053, loss: 0.7624
+2023-02-04 18:10:55,919 - mmcls - INFO - Epoch(val) [31][310]	mAP: 87.6512, CP: 78.0907, CR: 82.5918, CF1: 80.2782, OP: 80.6900, OR: 84.3719, OF1: 82.4899
+2023-02-04 18:11:10,333 - mmcls - INFO - Epoch [32][100/314]	lr: 1.000e-04, eta: 0:04:56, time: 0.143, data_time: 0.021, memory: 3053, loss: 0.8641
+2023-02-04 18:11:32,766 - mmcls - INFO - Epoch [32][200/314]	lr: 1.000e-04, eta: 0:04:48, time: 0.224, data_time: 0.002, memory: 3053, loss: 0.7854
+2023-02-04 18:11:55,210 - mmcls - INFO - Epoch [32][300/314]	lr: 1.000e-04, eta: 0:04:40, time: 0.224, data_time: 0.002, memory: 3053, loss: 0.8540
+2023-02-04 18:12:18,177 - mmcls - INFO - Epoch(val) [32][310]	mAP: 87.6132, CP: 79.3114, CR: 81.6388, CF1: 80.4583, OP: 81.7966, OR: 83.3595, OF1: 82.5706
+2023-02-04 18:12:42,692 - mmcls - INFO - Epoch [33][100/314]	lr: 1.000e-04, eta: 0:04:30, time: 0.244, data_time: 0.021, memory: 3053, loss: 0.7464
+2023-02-04 18:13:05,102 - mmcls - INFO - Epoch [33][200/314]	lr: 1.000e-04, eta: 0:04:21, time: 0.224, data_time: 0.002, memory: 3053, loss: 0.8114
+2023-02-04 18:13:27,529 - mmcls - INFO - Epoch [33][300/314]	lr: 1.000e-04, eta: 0:04:12, time: 0.224, data_time: 0.002, memory: 3053, loss: 0.8447
+2023-02-04 18:13:50,404 - mmcls - INFO - Epoch(val) [33][310]	mAP: 87.7497, CP: 78.9007, CR: 82.4726, CF1: 80.6471, OP: 80.8621, OR: 84.5287, OF1: 82.6548
+2023-02-04 18:14:14,942 - mmcls - INFO - Epoch [34][100/314]	lr: 1.000e-04, eta: 0:04:02, time: 0.244, data_time: 0.021, memory: 3053, loss: 0.7855
+2023-02-04 18:14:37,443 - mmcls - INFO - Epoch [34][200/314]	lr: 1.000e-04, eta: 0:03:52, time: 0.225, data_time: 0.002, memory: 3053, loss: 0.7767
+2023-02-04 18:14:58,912 - mmcls - INFO - Epoch [34][300/314]	lr: 1.000e-04, eta: 0:03:42, time: 0.215, data_time: 0.002, memory: 3053, loss: 0.8302
+2023-02-04 18:15:19,114 - mmcls - INFO - Epoch(val) [34][310]	mAP: 87.7179, CP: 78.4476, CR: 82.7427, CF1: 80.5379, OP: 80.0699, OR: 84.9565, OF1: 82.4408
+2023-02-04 18:15:43,703 - mmcls - INFO - Epoch [35][100/314]	lr: 1.000e-04, eta: 0:03:31, time: 0.244, data_time: 0.021, memory: 3053, loss: 0.8243
+2023-02-04 18:16:06,233 - mmcls - INFO - Epoch [35][200/314]	lr: 1.000e-04, eta: 0:03:20, time: 0.225, data_time: 0.002, memory: 3053, loss: 0.7929
+2023-02-04 18:16:28,782 - mmcls - INFO - Epoch [35][300/314]	lr: 1.000e-04, eta: 0:03:10, time: 0.225, data_time: 0.002, memory: 3053, loss: 0.8212
+2023-02-04 18:16:51,635 - mmcls - INFO - Epoch(val) [35][310]	mAP: 87.7845, CP: 78.5867, CR: 82.6648, CF1: 80.5742, OP: 80.4242, OR: 84.8852, OF1: 82.5945
+2023-02-04 18:17:16,214 - mmcls - INFO - Epoch [36][100/314]	lr: 1.000e-04, eta: 0:02:58, time: 0.244, data_time: 0.021, memory: 3053, loss: 0.7179
+2023-02-04 18:17:38,700 - mmcls - INFO - Epoch [36][200/314]	lr: 1.000e-04, eta: 0:02:47, time: 0.225, data_time: 0.002, memory: 3053, loss: 0.7341
+2023-02-04 18:18:01,237 - mmcls - INFO - Epoch [36][300/314]	lr: 1.000e-04, eta: 0:02:36, time: 0.225, data_time: 0.002, memory: 3053, loss: 0.8449
+2023-02-04 18:18:24,081 - mmcls - INFO - Epoch(val) [36][310]	mAP: 87.8296, CP: 78.0147, CR: 82.7996, CF1: 80.3360, OP: 80.1051, OR: 84.7997, OF1: 82.3855
+2023-02-04 18:18:48,685 - mmcls - INFO - Epoch [37][100/314]	lr: 1.000e-04, eta: 0:02:23, time: 0.244, data_time: 0.021, memory: 3053, loss: 0.7833
+2023-02-04 18:19:08,442 - mmcls - INFO - Epoch [37][200/314]	lr: 1.000e-04, eta: 0:02:11, time: 0.198, data_time: 0.002, memory: 3053, loss: 0.8000
+2023-02-04 18:19:29,643 - mmcls - INFO - Epoch [37][300/314]	lr: 1.000e-04, eta: 0:01:59, time: 0.211, data_time: 0.001, memory: 3053, loss: 0.7806
+2023-02-04 18:19:52,539 - mmcls - INFO - Epoch(val) [37][310]	mAP: 87.7424, CP: 77.8601, CR: 82.7951, CF1: 80.2518, OP: 80.2462, OR: 84.5715, OF1: 82.3521
+2023-02-04 18:20:17,110 - mmcls - INFO - Epoch [38][100/314]	lr: 1.000e-04, eta: 0:01:46, time: 0.244, data_time: 0.021, memory: 3053, loss: 0.7693
+2023-02-04 18:20:39,584 - mmcls - INFO - Epoch [38][200/314]	lr: 1.000e-04, eta: 0:01:34, time: 0.225, data_time: 0.002, memory: 3053, loss: 0.7714
+2023-02-04 18:21:01,996 - mmcls - INFO - Epoch [38][300/314]	lr: 1.000e-04, eta: 0:01:22, time: 0.224, data_time: 0.002, memory: 3053, loss: 0.8028
+2023-02-04 18:21:24,862 - mmcls - INFO - Epoch(val) [38][310]	mAP: 87.5742, CP: 78.0045, CR: 82.2266, CF1: 80.0600, OP: 80.8753, OR: 84.0582, OF1: 82.4360
+2023-02-04 18:21:49,428 - mmcls - INFO - Epoch [39][100/314]	lr: 1.000e-04, eta: 0:01:07, time: 0.244, data_time: 0.021, memory: 3053, loss: 0.7490
+2023-02-04 18:22:11,898 - mmcls - INFO - Epoch [39][200/314]	lr: 1.000e-04, eta: 0:00:55, time: 0.225, data_time: 0.002, memory: 3053, loss: 0.7477
+2023-02-04 18:22:34,416 - mmcls - INFO - Epoch [39][300/314]	lr: 1.000e-04, eta: 0:00:42, time: 0.225, data_time: 0.002, memory: 3053, loss: 0.7354
+2023-02-04 18:22:57,229 - mmcls - INFO - Epoch(val) [39][310]	mAP: 87.7837, CP: 78.0932, CR: 82.7035, CF1: 80.3323, OP: 80.3746, OR: 84.4432, OF1: 82.3587
+2023-02-04 18:23:18,473 - mmcls - INFO - Epoch [40][100/314]	lr: 1.000e-04, eta: 0:00:27, time: 0.211, data_time: 0.021, memory: 3053, loss: 0.7916
+2023-02-04 18:23:40,954 - mmcls - INFO - Epoch [40][200/314]	lr: 1.000e-04, eta: 0:00:15, time: 0.225, data_time: 0.002, memory: 3053, loss: 0.7797
+2023-02-04 18:24:03,417 - mmcls - INFO - Epoch [40][300/314]	lr: 1.000e-04, eta: 0:00:01, time: 0.225, data_time: 0.002, memory: 3053, loss: 0.8422
+2023-02-04 18:24:06,393 - mmcls - INFO - Saving checkpoint at 40 epochs
+2023-02-04 18:24:29,509 - mmcls - INFO - Epoch(val) [40][310]	mAP: 87.6852, CP: 78.6146, CR: 82.4782, CF1: 80.5001, OP: 80.5782, OR: 84.6571, OF1: 82.5673
